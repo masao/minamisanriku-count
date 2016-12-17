@@ -106,18 +106,15 @@ def parse_lines(io, format = :export, option = :items)
 end
 
 class App < Sinatra::Base
-  helpers do
-    def h(text)
-      Rack::Utils.escape_html(text)
-    end
+  def initialize
+    @baseurl = ENV["baseurl"]
+    super
   end
-
   get "/" do
     erb :index
   end
   post "/" do
     if params[:file]
-      #STDERR.puts params[:file].inspect
       cont = params[:file][:tempfile]
       parse_lines(open(cont))
     end
