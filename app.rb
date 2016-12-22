@@ -4,6 +4,7 @@ require "sinatra/json"
 require "rack"
 require "rack/contrib"
 
+require "csv"
 require "kconv"
 require "date"
 
@@ -66,29 +67,37 @@ end
 
 def parse_lines(io, format = :export, option = :items)
   Encoding.default_external = "utf-8"
+  csv_options = {
+    headers: true,
+    return_headers: true,
+    write_headers: true,
+    col_sep: "\t",
+  }
+  csv = CSV.new(io, csv_options)
   items = {}
   manifestations = {}
-  io.gets
-  io.each do |line|
-    item_id, manifestation_id, call_number, item_identifier, ndc, shelf, = line.chomp.split( /\t/ ) if format == :cli
-    manifestation_id, original_title, creator, publisher, pub_date, price, isbn, issn, item_identifier, call_number, item_price, acquired_at, bookstore, budget_type, circulation_status, shelf, library, = line.chomp.split( /\t/ ) if format == :export
-    created_at, item_identifier, call_number, shelf, carrier_type, original_title, = line.chomp.split( /\t/ ) if format == :checkout
-    if created_at
-      created_at = Date.parse(created_at)
-      next if filter[:from] and filter[:from] > created_at
-      next if filter[:until] and filter[:until] <= created_at
+  csv.each do |row|
+    #item_id, manifestation_id, call_number, item_identifier, ndc, shelf, = line.chomp.split( /\t/ ) if format == :cli
+    #manifestation_id, original_title, creator, publisher, pub_date, price, isbn, issn, item_identifier, call_number, item_price, acquired_at, bookstore, budget_type, circulation_status, shelf, library, = line.chomp.split( /\t/ ) if format == :export
+    #created_at, item_identifier, call_number, shelf, carrier_type, original_title, = line.chomp.split( /\t/ ) if format == :checkout
+    if row["created_at"]
+      created_at = Date.parse(row["created_at"])
+      next if filter[:from] and filter[:from] > row["created_at"]
+      next if filter[:until] and filter[:until] <= row["created_at"]
     end
-    item_id = item_identifier unless item_id
-    call_number = NKF.nkf( "-WwZ1", call_number.to_s )
+    item_id = row["item_id"]
+    item_id = row["item_identifier"] unless item_id
+    shelf = row["shelf"]
+    call_number = NKF.nkf( "-WwZ1", row["call_number"].to_s )
     begin
-       code = callnum_to_category( call_number, ndc )
+       code = callnum_to_category( call_number, row["ndc"] )
     rescue UnknownCode
-       STDERR.puts line
+       STDERR.puts row.inspect
        next
     end
     manifestations[ code ] ||= {}
     manifestations[ code ][ shelf.to_s ] ||= []
-    manifestations[ code ][ shelf.to_s ] << manifestation_id
+    manifestations[ code ][ shelf.to_s ] << row["manifestation_id"]
     items[ code ] ||= {}
     items[ code ][ shelf.to_s ] ||= []
     items[ code ][ shelf.to_s ] << item_id
