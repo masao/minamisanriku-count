@@ -110,6 +110,11 @@ class App < Sinatra::Base
     @baseurl = ENV["baseurl"]
     super
   end
+  before do
+    if not request.secure? and request.host != "localhost"
+      redirect request.url.sub('http', 'https')
+    end
+  end
   get "/" do
     erb :index
   end
