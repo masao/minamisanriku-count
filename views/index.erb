@@ -27,6 +27,31 @@
   <% end %>
   </table>
 </div>
+<script language="Javascript" type="application/javascript">
+var result_array = [];
+var row = [""];
+<% shelves.each do |shelf| %>
+  row.push("<%= shelf %>");
+<% end %>
+result_array.push(row);
+<% @result.sort.each do |k, v| %>
+  var row = ["<%= k %>"];
+  <% shelves.each do |shelf| %>
+    row.push("<%= v[shelf].to_a.size %>");
+  <% end %>
+  result_array.push(row);
+<% end %>
+var csv_content = "data:text/csv;charset=utf-8,";
+result_array.forEach(function(members, index){
+  csv_content += members.join(",") + "\r\n";
+});
+var uri = encodeURI(csv_content);
+var link = document.createElement("a");
+link.textContent = "CSV形式でダウンロード";
+link.setAttribute("href", uri);
+link.setAttribute("download", "download.csv");
+document.getElementById("result").appendChild(link);
+</script>
 <% end %>
 <% if @baseurl %>
 <ul>
