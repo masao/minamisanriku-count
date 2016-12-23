@@ -26,8 +26,10 @@
     </tr>
   <% end %>
   </table>
+  <a href="#" id="download" download="download.csv" onclick="downloadCsv()">CSV形式でダウンロード</a>
 </div>
 <script language="Javascript" type="application/javascript">
+function downloadCsv() {
 var result_array = [];
 var row = [""];
 <% shelves.each do |shelf| %>
@@ -41,16 +43,20 @@ result_array.push(row);
   <% end %>
   result_array.push(row);
 <% end %>
-var csv_content = "data:text/csv;charset=utf-8,";
+var csv_content = "";
 result_array.forEach(function(members, index){
   csv_content += members.join(",") + "\r\n";
 });
-var uri = encodeURI(csv_content);
-var link = document.createElement("a");
-link.textContent = "CSV形式でダウンロード";
-link.setAttribute("href", uri);
-link.setAttribute("download", "download.csv");
-document.getElementById("result").appendChild(link);
+var bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+var blob = new Blob([bom, csv_content], {type: "text/csv"});
+var link = document.getElementById("download");
+if (window.navigator.msSaveBlob) { 
+  //window.navigator.msSaveBlob(blob, link.download); 
+  window.navigator.msSaveOrOpenBlob(blob, link.getAttribute("download")); 
+} else {
+  link.href = window.URL.createObjectURL(blob);
+}
+}
 </script>
 <% end %>
 <% if @baseurl %>
