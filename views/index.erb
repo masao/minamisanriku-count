@@ -9,7 +9,7 @@
 </form>
 <% if @result %>
 <div id="result">
-  <% shelves = @result.map{|k, v| v.keys }.flatten.compact.uniq %>
+  <% shelves = @result.map{|k, v| v.keys }.flatten.compact.uniq.sort %>
   <table>
   <tr>
     <th></th>
