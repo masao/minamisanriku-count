@@ -9,6 +9,7 @@
 </form>
 <% if @result %>
 <div id="result">
+<p>File: <%= params[:file][:filename] %></p>
   <% shelves = @result.map{|k, v| v.keys }.flatten.compact.uniq.sort %>
   <table>
   <tr>
