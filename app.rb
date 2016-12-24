@@ -69,7 +69,6 @@ def parse_lines(io, format = :export, option = :items)
   Encoding.default_external = "utf-8"
   csv_options = {
     headers: true,
-    return_headers: true,
     write_headers: true,
     col_sep: "\t",
   }
