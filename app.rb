@@ -84,6 +84,7 @@ def parse_lines(io, format = :export, option = :items)
       next if filter[:from] and filter[:from] > row["created_at"]
       next if filter[:until] and filter[:until] <= row["created_at"]
     end
+    next if row["circulation_status"] == "Removed"
     item_id = row["item_id"]
     item_id = row["item_identifier"] unless item_id
     shelf = row["shelf"]

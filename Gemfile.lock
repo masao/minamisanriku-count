@@ -14,7 +14,7 @@ GEM
       tzinfo (~> 1.1)
     arel (7.1.4)
     backports (3.6.8)
-    concurrent-ruby (1.0.3)
+    concurrent-ruby (1.0.4)
     diff-lcs (1.2.5)
     factory_girl (4.8.0)
       activesupport (>= 3.0.0)
@@ -85,4 +85,4 @@ DEPENDENCIES
   sinatra-contrib
 
 BUNDLED WITH
-   1.13.1
+   1.13.7
